@@ -33,9 +33,9 @@
 
 int main(int argc, char** argv)
 {
-    ros::init(argc,argv, "p2os");
-    ros::NodeHandle n;
-    
+    rclcpp::init(argc, argv);
+    auto n = std::make_shared<rclcpp::Node>("p2os");
+
     P2OSNode *p = new P2OSNode(n);
     
     if(p->Setup())
@@ -46,9 +46,9 @@ int main(int argc, char** argv)
     
     p->ResetRawPositions();
     
-    ros::Time lastTime;
+    rclcpp::Time lastTime;
     
-    while(ros::ok())
+    while(rclcpp::ok())
     {
         p->check_and_set_vel();
         p->check_and_set_motor_state();
@@ -56,9 +56,9 @@ int main(int argc, char** argv)
         
         if(p->get_pulse() > 0)
         {
-            ros::Time currentTime = ros::Time::now();
-            ros::Duration pulseInterval = currentTime - lastTime;
-            if(pulseInterval.toSec() > p->get_pulse())
+            rclcpp::Time currentTime = n->now();
+            rclcpp::Duration pulseInterval = currentTime - lastTime;
+            if(pulseInterval.seconds() > p->get_pulse())
             { 
                 ROS_DEBUG ("sending pulse" );
                 p->SendPulse();
@@ -73,12 +73,12 @@ int main(int argc, char** argv)
         // is no data waiting this will sit around waiting until one comes
         p->SendReceive(NULL,true);
         p->updateDiagnostics();
-        ros::spinOnce();
+        rclcpp::spin_some(n);
     }
     
     if(!p->Shutdown())
     {
-        ROS_WARN("p2os shutdown failed... your robot might be heading for the wall?");
+        RCLCPP_WARN(n->get_logger(),"p2os shutdown failed... your robot might be heading for the wall?");
     }
     delete p; //delete pointer
     

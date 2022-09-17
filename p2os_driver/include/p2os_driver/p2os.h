@@ -68,23 +68,23 @@
  *  Robot's sensors.
  */
 struct ros_p2os_data_t {
-  //! Provides the position of the robot
-  nav_msgs::msg::Odometry  position;
-  //! Provides the battery voltage
-  p2os_msgs::msg::BatteryState batt;
-  //! Provides the state of the motors (enabled or disabled)
-  p2os_msgs::msg::MotorState motors;
-  //! Provides the state of the gripper
-  p2os_msgs::msg::GripperState gripper;
-  //! Container for sonar data
-  p2os_msgs::msg::SonarArray sonar;
-  //! Digital In/Out
-  p2os_msgs::msg::DIO dio;
-  //! Analog In/Out
-  p2os_msgs::msg::AIO aio;
-  //! Transformed odometry frame.
-  geometry_msgs::msg::TransformStamped odom_trans;
-}
+    //! Provides the position of the robot
+    nav_msgs::msg::Odometry position;
+    //! Provides the battery voltage
+    p2os_msgs::msg::BatteryState batt;
+    //! Provides the state of the motors (enabled or disabled)
+    p2os_msgs::msg::MotorState motors;
+    //! Provides the state of the gripper
+    p2os_msgs::msg::GripperState gripper;
+    //! Container for sonar data
+    p2os_msgs::msg::SonarArray sonar;
+    //! Digital In/Out
+    p2os_msgs::msg::DIO dio;
+    //! Analog In/Out
+    p2os_msgs::msg::AIO aio;
+    //! Transformed odometry frame.
+    geometry_msgs::msg::TransformStamped odom_trans;
+};
 
 // this is here because we need the above typedef's before including it.
 #include "sip.h"
@@ -98,134 +98,148 @@ class SIP;
 //class KineCalc;
 
 
-class P2OSNode
-{
-  /*! \brief P2OS robot driver node.
-   *
-   *  This class contains, essentially, the main means of communication
-   *  between the robot and ROS.
-   */
+class P2OSNode {
+    /*! \brief P2OS robot driver node.
+     *
+     *  This class contains, essentially, the main means of communication
+     *  between the robot and ROS.
+     */
 public:
-  P2OSNode(std::shared_ptr<rclcpp::node> _node);
-  virtual ~P2OSNode();
+    P2OSNode(const std::shared_ptr<rclcpp::Node>& _node);
 
-  //! Setup the robot for use. Communicates with the robot directly.
-  int Setup();
-  //! Prepare for shutdown.
-  int Shutdown();
+    virtual ~P2OSNode();
 
-  int SendReceive(P2OSPacket* pkt, bool publish_data = true );
+    //! Setup the robot for use. Communicates with the robot directly.
+    int Setup();
 
-  void updateDiagnostics();
+    //! Prepare for shutdown.
+    int Shutdown();
 
-  void ResetRawPositions();
-  void ToggleSonarPower(unsigned char val);
-  void ToggleMotorPower(unsigned char val);
-  void StandardSIPPutData(tf2::TimePoint & ts);
+    int SendReceive(P2OSPacket *pkt, bool publish_data = true);
 
-  inline double TicksToDegrees (int joint, unsigned char ticks);
-  inline unsigned char DegreesToTicks (int joint, double degrees);
-  inline double TicksToRadians (int joint, unsigned char ticks);
-  inline unsigned char RadiansToTicks (int joint, double rads);
-  inline double RadsPerSectoSecsPerTick (int joint, double speed);
-  inline double SecsPerTicktoRadsPerSec (int joint, double secs);
+    void updateDiagnostics();
 
-  void SendPulse (void);
-  //void spin();
-  void check_and_set_vel();
-  void cmdvel_cb(const std::shared_ptr<geometry_msgs::msg::Twist>);
+    void ResetRawPositions();
 
-  void check_and_set_motor_state();
-  void cmdmotor_state(const std::shared_ptr<p2os_msgs::msg::MotorState>);
+    void ToggleSonarPower(unsigned char val);
 
-  void check_and_set_gripper_state();
-  void gripperCallback(const std::shared_ptr<p2os_msgs::msg::GripperStateConstPtr);
-  const double & get_pulse() { return pulse; }
+    void ToggleMotorPower(unsigned char val);
 
-  // diagnostic messages
-  /* TODO(allenh1): re-enable diagnostic_updater */
-  /* void check_voltage( diagnostic_updater::DiagnosticStatusWrapper &stat ); */
-  /* void check_stall( diagnostic_updater::DiagnosticStatusWrapper &stat ); */
+    void StandardSIPPutData(rclcpp::Time &ts);
 
-  //! Command Velocity subscriber
-  geometry_msgs::msg::Twist cmdvel_;
-  //! Motor state publisher
-  p2os_msgs::msg::MotorState  cmdmotor_state_;
-  //! Gripper state publisher
-  p2os_msgs::msg::GripperState gripper_state_;
-  //! sensor data container
-  ros_p2os_data_t p2os_data;
+    inline double TicksToDegrees(int joint, unsigned char ticks);
+
+    inline unsigned char DegreesToTicks(int joint, double degrees);
+
+    inline double TicksToRadians(int joint, unsigned char ticks);
+
+    inline unsigned char RadiansToTicks(int joint, double rads);
+
+    inline double RadsPerSectoSecsPerTick(int joint, double speed);
+
+    inline double SecsPerTicktoRadsPerSec(int joint, double secs);
+
+    void SendPulse(void);
+
+    //void spin();
+    void check_and_set_vel();
+
+    void cmdvel_cb(const std::shared_ptr<geometry_msgs::msg::Twist>);
+
+    void check_and_set_motor_state();
+
+    void cmdmotor_state(const std::shared_ptr<p2os_msgs::msg::MotorState>);
+
+    void check_and_set_gripper_state();
+
+    void gripperCallback(const std::shared_ptr<p2os_msgs::msg::GripperState>);
+
+    const double &get_pulse() { return pulse; }
+
+    // diagnostic messages
+    /* TODO(allenh1): re-enable diagnostic_updater */
+    /* void check_voltage( diagnostic_updater::DiagnosticStatusWrapper &stat ); */
+    /* void check_stall( diagnostic_updater::DiagnosticStatusWrapper &stat ); */
+
+    //! Command Velocity subscriber
+    geometry_msgs::msg::Twist cmdvel_;
+    //! Motor state publisher
+    p2os_msgs::msg::MotorState cmdmotor_state_;
+    //! Gripper state publisher
+    p2os_msgs::msg::GripperState gripper_state_;
+    //! sensor data container
+    ros_p2os_data_t p2os_data;
 
 protected:
-  //! Node Handler used for publication of data.
-  std::shared_ptr<rclcpp::Node> node;
+    //! Node Handler used for publication of data.
+    std::shared_ptr<rclcpp::Node> node;
 
-  /* TODO(allenh1): replace this with ROS2's version of dynamic_reconfigure */
-  /* diagnostic_updater::Updater diagnostic_; */
-  /* diagnostic_updater::DiagnosedPublisher<p2os_msgs::BatteryState> batt_pub_; */
+    /* TODO(allenh1): replace this with ROS2's version of dynamic_reconfigure */
+    /* diagnostic_updater::Updater diagnostic_; */
+    /* diagnostic_updater::DiagnosedPublisher<p2os_msgs::BatteryState> batt_pub_; */
 
-  /* declare publishers */
-  rclcpp::Publisher<p2os_msgs::msg::MotorState> mstate_pub_;
-  rclcpp::Publisher<p2os_msgs::msg::GripperState> grip_state_pub_;
-  rclcpp::Publisher<p2os_msgs::msg::PTZState> ptz_state_pub_;
-  rclcpp::Publisher<p2os_msgs::msg::SonarArray> sonar_pub_;
-  rclcpp::Publisher<p2os_msgs::msg::AIO> aio_pub_;
-  rclcpp::Publisher<p2os_msgs::msg::DIO> dio_pub_;
-  rclcpp::Publisher<nav_msgs::msg::Odometry> pose_pub_;
+    /* declare publishers */
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::MotorState>> mstate_pub_;
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::GripperState>> grip_state_pub_;
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::PTZState>> ptz_state_pub_;
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::SonarArray>> sonar_pub_;
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::AIO>> aio_pub_;
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::DIO>> dio_pub_;
+    std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> pose_pub_;
 
-  /* declare subscribers */
-  rclcpp::Subscription<geometry_msgs::msg::Twist> cmdvel_sub_;
-  rclcpp::Subscription<p2os_msgs::msg::MotorState> cmdmstate_sub_;
-  rclcpp::Subscription<p2os_msgs::msg::GripperState> gripper_sub_;
-  rclcpp::Subscription<p2os_msgs::msg::PTZState> ptz_cmd_sub_;
+    /* declare subscribers */
+    std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> cmdvel_sub_;
+    std::shared_ptr<rclcpp::Subscription<p2os_msgs::msg::MotorState>> cmdmstate_sub_;
+    std::shared_ptr<rclcpp::Subscription<p2os_msgs::msg::GripperState>> gripper_sub_;
+    std::shared_ptr<rclcpp::Subscription<p2os_msgs::msg::PTZState>> ptz_cmd_sub_;
 
-  tf2_ros::Buffer * buffer = nullptr;
-  tf2_ros::TransformBroadcaster * odom_broadcaster = nullptr;
-  tf2::TimePoint veltime;
+    tf2_ros::Buffer *buffer = nullptr;
+    tf2_ros::TransformBroadcaster *odom_broadcaster = nullptr;
+    rclcpp::Time veltime;
 
-  SIP* sippacket;
-  std::string psos_serial_port;
-  std::string psos_tcp_host;
-  std::string odom_frame_id;
-  std::string base_link_frame_id;
-  int         psos_fd;
-  bool        psos_use_tcp;
-  int         psos_tcp_port;
-  bool        vel_dirty, motor_dirty;
-  bool        gripper_dirty_ = false;
-  int         param_idx;
-  // PID settings
-  int rot_kp, rot_kv, rot_ki, trans_kp, trans_kv, trans_ki;
+    SIP *sippacket;
+    std::string psos_serial_port;
+    std::string psos_tcp_host;
+    std::string odom_frame_id;
+    std::string base_link_frame_id;
+    int psos_fd;
+    bool psos_use_tcp;
+    int psos_tcp_port;
+    bool vel_dirty, motor_dirty;
+    bool gripper_dirty_ = false;
+    int param_idx;
+    // PID settings
+    int rot_kp, rot_kv, rot_ki, trans_kp, trans_kv, trans_ki;
 
-  //! Stall I hit a wall?
-  int bumpstall; // should we change the bumper-stall behavior?
-  //! Use Joystick?
-  int joystick;
-  //! Control wheel velocities individually?
-  int direct_wheel_vel_control;
-  int radio_modemp;
+    //! Stall I hit a wall?
+    int bumpstall; // should we change the bumper-stall behavior?
+    //! Use Joystick?
+    int joystick;
+    //! Control wheel velocities individually?
+    int direct_wheel_vel_control;
+    int radio_modemp;
 
-  //! Maximum motor speed in Meters per second.
-  int motor_max_speed;
-  //! Maximum turn speed in radians per second.
-  int motor_max_turnspeed;
-  //! Maximum translational acceleration in Meters per second per second.
-  short motor_max_trans_accel;
-  //! Minimum translational acceleration in Meters per second per second.
-  short motor_max_trans_decel;
-  //! Maximum rotational acceleration in radians per second per second.
-  short motor_max_rot_accel;
-  //! Minimum rotational acceleration in Meters per second per second.
-  short motor_max_rot_decel;
-  //! Pulse time
-  double pulse;
-  double desired_freq;
-  //! Last time the node received or sent a pulse.
-  double lastPulseTime;
-  //! Use the sonar array?
-  bool use_sonar_;
+    //! Maximum motor speed in Meters per second.
+    int motor_max_speed;
+    //! Maximum turn speed in radians per second.
+    int motor_max_turnspeed;
+    //! Maximum translational acceleration in Meters per second per second.
+    short motor_max_trans_accel;
+    //! Minimum translational acceleration in Meters per second per second.
+    short motor_max_trans_decel;
+    //! Maximum rotational acceleration in radians per second per second.
+    short motor_max_rot_accel;
+    //! Minimum rotational acceleration in Meters per second per second.
+    short motor_max_rot_decel;
+    //! Pulse time
+    double pulse;
+    double desired_freq;
+    //! Last time the node received or sent a pulse.
+    double lastPulseTime;
+    //! Use the sonar array?
+    bool use_sonar_;
 
-  P2OSPtz ptz_;
+    P2OSPtz ptz_;
 };
 
 #endif

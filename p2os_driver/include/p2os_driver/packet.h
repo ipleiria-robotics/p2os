@@ -37,7 +37,7 @@ class P2OSPacket
  public:
   unsigned char packet[PACKET_LEN];
   unsigned char size;
-  ros::Time timestamp;
+  rclcpp::Time timestamp;
 
   int CalcChkSum();
 
@@ -45,7 +45,7 @@ class P2OSPacket
   void PrintHex();
   int Build( unsigned char *data, unsigned char datasize );
   int Send( int fd );
-  int Receive( int fd );
+  int Receive( int fd , const std::shared_ptr<rclcpp::Node>& node);
   bool Check();
   
   bool operator!= ( P2OSPacket p ) {

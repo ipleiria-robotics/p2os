@@ -139,7 +139,7 @@ class P2OSPtz
   // Core Functions
   int setup();
   void shutdown();
-  void callback(const p2os_msgs::PTZStateConstPtr &msg);
+  void callback(const std::shared_ptr<p2os_msgs::msg::PTZState> msg);
 
   // Communication Functions
   int sendCommand(unsigned char *str, int len);
@@ -163,7 +163,7 @@ class P2OSPtz
 
   // Simple getters and setters
   bool isOn() const { return is_on_; }
-  p2os_msgs::PTZState getCurrentState() { return current_state_; }
+  p2os_msgs::msg::PTZState getCurrentState() { return current_state_; }
 
   // Class members
  protected:
@@ -176,7 +176,7 @@ class P2OSPtz
   bool is_on_;
   int error_code_;
   bool bidirectional_com_;
-  p2os_msgs::PTZState current_state_;
+  p2os_msgs::msg::PTZState current_state_;
 
   // Class constants
   static const int MAX_COMMAND_LENGTH;

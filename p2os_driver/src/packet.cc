@@ -28,23 +28,26 @@
 #include <unistd.h>
 #include <stdlib.h> /* for exit() */
 
+
+rclcpp::Logger logger = rclcpp::get_logger("p2os_packet");
+
 void P2OSPacket::Print()
 {
     if (packet) {
-        ROS_INFO("\"");
+        RCLCPP_INFO(logger, "\"");
         for(int i=0;i<size;i++)
-            ROS_INFO("%u ", packet[i]);
-        ROS_INFO("\"");
+            RCLCPP_INFO(logger, "%u ", packet[i]);
+        RCLCPP_INFO(logger, "\"");
     }
 }
 
 void P2OSPacket::PrintHex()
 {
     if (packet) {
-        ROS_INFO("\"");
+        RCLCPP_INFO(logger, "\"");
         for(int i=0;i<size;i++)
-            ROS_INFO("0x%.2x ", packet[i]);
-        ROS_INFO("\"");
+            RCLCPP_INFO(logger, "0x%.2x ", packet[i]);
+        RCLCPP_INFO(logger, "\"");
     }
 }
 
@@ -78,7 +81,7 @@ int P2OSPacket::CalcChkSum() {
     return(c);
 }
 
-int P2OSPacket::Receive(int fd)
+int P2OSPacket::Receive(int fd, const std::shared_ptr<rclcpp::Node>& node)
 {
     unsigned char prefix[3];
     int cnt;
@@ -96,7 +99,7 @@ int P2OSPacket::Receive(int fd)
             {
                 if ( (cnt+=read( fd, &prefix[2], 1 )) < 0 )
                 {
-                    ROS_ERROR("Error reading packet header from robot connection: P2OSPacket():Receive():read():");
+                    RCLCPP_ERROR(logger, "Error reading packet header from robot connection: P2OSPacket():Receive():read():");
                     return(1);
                 }
             }
@@ -104,7 +107,7 @@ int P2OSPacket::Receive(int fd)
             if (prefix[0] == 0xFA && prefix[1] == 0xFB)
                 break;
 
-            timestamp = ros::Time::now();
+            timestamp = node->now();
 
             //GlobalTime->GetTimeDouble(&timestamp);
 
@@ -112,7 +115,7 @@ int P2OSPacket::Receive(int fd)
             prefix[1] = prefix[2];
             //skipped++;
         }
-        //if (skipped>3) ROS_INFO("Skipped %d bytes\n", skipped);
+        //if (skipped>3) RCLCPP_INFO(logger, "Skipped %d bytes\n", skipped);
 
         size = prefix[2]+3;
         memcpy( packet, prefix, 3);
@@ -122,7 +125,7 @@ int P2OSPacket::Receive(int fd)
         {
             if ((cnt+=read(fd, &packet[3+cnt],  prefix[2]-cnt)) < 0 )
             {
-                ROS_ERROR("Error reading packet body from robot connection: P2OSPacket():Receive():read():");
+                RCLCPP_ERROR(logger, "Error reading packet body from robot connection: P2OSPacket():Receive():read():");
                 return(1);
             }
         }
@@ -140,7 +143,7 @@ int P2OSPacket::Build(unsigned char *data, unsigned char datasize) {
     packet[1]=0xFB;
 
     if ( size > 198 ) {
-        ROS_ERROR("Packet to P2OS can't be larger than 200 bytes");
+        RCLCPP_ERROR(logger, "Packet to P2OS can't be larger than 200 bytes");
         return(1);
     }
     packet[2] = datasize + 2;
@@ -152,7 +155,7 @@ int P2OSPacket::Build(unsigned char *data, unsigned char datasize) {
     packet[3+datasize+1] = chksum & 0xFF;
 
     if (!Check()) {
-        ROS_ERROR("DAMN");
+        RCLCPP_ERROR(logger, "DAMN");
         return(1);
     }
     return(0);
@@ -166,7 +169,7 @@ int P2OSPacket::Send(int fd)
     {
         if((cnt += write( fd, packet, size )) < 0)
         {
-            ROS_ERROR("Send");
+            RCLCPP_ERROR(logger, "Send");
             return(1);
         }
     }

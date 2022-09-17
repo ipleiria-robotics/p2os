@@ -103,6 +103,8 @@ P2OSNode::P2OSNode(const std::shared_ptr<rclcpp::Node> &_node)
     aio_pub_ = node->create_publisher<p2os_msgs::msg::AIO>("aio", 10);
     dio_pub_ = node->create_publisher<p2os_msgs::msg::DIO>("dio", 10);
 
+    odom_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(node);
+
 //  qos = rmw_qos_profile_default;
 //  qos.depth = 1; /* TODO(allenh1): is this value too small? */
 

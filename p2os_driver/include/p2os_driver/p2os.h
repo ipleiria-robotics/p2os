@@ -194,7 +194,7 @@ protected:
     std::shared_ptr<rclcpp::Subscription<p2os_msgs::msg::PTZState>> ptz_cmd_sub_;
 
     tf2_ros::Buffer *buffer = nullptr;
-    tf2_ros::TransformBroadcaster *odom_broadcaster = nullptr;
+    std::shared_ptr<tf2_ros::TransformBroadcaster> odom_broadcaster = nullptr;
     rclcpp::Time veltime;
 
     SIP *sippacket;

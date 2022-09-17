@@ -186,6 +186,7 @@ protected:
     std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::AIO>> aio_pub_;
     std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::DIO>> dio_pub_;
     std::shared_ptr<rclcpp::Publisher<nav_msgs::msg::Odometry>> pose_pub_;
+    std::shared_ptr<rclcpp::Publisher<p2os_msgs::msg::BatteryState>> batt_pub_;
 
     /* declare subscribers */
     std::shared_ptr<rclcpp::Subscription<geometry_msgs::msg::Twist>> cmdvel_sub_;

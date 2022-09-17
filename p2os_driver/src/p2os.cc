@@ -96,6 +96,7 @@ P2OSNode::P2OSNode(const std::shared_ptr<rclcpp::Node> &_node)
 //  qos.durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
     /* advertise topics */
     pose_pub_ = node->create_publisher<nav_msgs::msg::Odometry>("pose", 10);
+    batt_pub_ = node->create_publisher<p2os_msgs::msg::BatteryState>("battery_state", 10);
     mstate_pub_ = node->create_publisher<p2os_msgs::msg::MotorState>("motor_state", 10);
     grip_state_pub_ = node->create_publisher<p2os_msgs::msg::GripperState>("gripper_state", 10);
     ptz_state_pub_ = node->create_publisher<p2os_msgs::msg::PTZState>("ptz_state", 10);
@@ -643,9 +644,8 @@ P2OSNode::StandardSIPPutData(rclcpp::Time& ts) {
     pose_pub_->publish(p2os_data.position);
     p2os_data.odom_trans.header.stamp = ts;
     odom_broadcaster->sendTransform(p2os_data.odom_trans);
-
     p2os_data.batt.header.stamp = ts;
-//    batt_pub_->publish(p2os_data.batt);
+    batt_pub_->publish(p2os_data.batt);
     mstate_pub_->publish(p2os_data.motors);
 
     // put sonar data

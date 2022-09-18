@@ -33,60 +33,69 @@ P2OSNode::P2OSNode(const std::shared_ptr<rclcpp::Node> &_node)
      *
      *  This brings up the P2OS system for ROS operation.
      */
-    node->get_parameter_or("odom_frame_id", odom_frame_id, std::string("odom"));
-    node->get_parameter_or("base_link_grame_id", base_link_frame_id, std::string("base_link"));
-    node->get_parameter_or("use_sonar", use_sonar_, false);
+    param_listener_ = std::make_shared<p2os_parameters::ParamListener>(node);
+    params_ = param_listener_->get_params();
 
-    // read in config options
-    // bumpstall
-    node->get_parameter_or("bumpstall", bumpstall, -1);
-    // pulse
-    node->get_parameter_or("pulse", pulse, -1.0);
-    // rot_kp
-    node->get_parameter_or("rot_kp", rot_kp, -1);
-    // rot_kv
-    node->get_parameter_or("rot_kv", rot_kv, -1);
-    // rot_ki
-    node->get_parameter_or("rot_ki", rot_ki, -1);
-    // trans_kp
-    node->get_parameter_or("trans_kp", trans_kp, -1);
-    // trans_kv
-    node->get_parameter_or("trans_kv", trans_kv, -1);
-    // trans_ki
-    node->get_parameter_or("trans_ki", trans_ki, -1);
-    // !!! port !!!
-    node->get_parameter_or("port", psos_serial_port, std::string(DEFAULT_P2OS_PORT));
-    RCUTILS_LOG_INFO("using serial port: [%s]", psos_serial_port.c_str());
-    node->get_parameter_or("use_tcp", psos_use_tcp, false);
-    std::string host(DEFAULT_P2OS_TCP_REMOTE_HOST);
-    node->get_parameter_or("tcp_remote_host", psos_tcp_host, host);
-    node->get_parameter_or("tcp_remote_port", psos_tcp_port, DEFAULT_P2OS_TCP_REMOTE_PORT);
-    // radio
-    node->get_parameter_or("radio", radio_modemp, 0);
-    // joystick
-    node->get_parameter_or("joystick", joystick, 0);
-    // direct_wheel_vel_control
-    node->get_parameter_or("direct_wheel_vel_control", direct_wheel_vel_control, 0);
+//    node->get_parameter_or("odom_frame_id", odom_frame_id, std::string("odom"));
+//    node->get_parameter_or("base_link_frame_id", base_link_frame_id, std::string("base_link"));
+//    node->get_parameter_or("use_sonar", use_sonar_, false);
+//
+//    // read in config options
+//    // bumpstall
+//    node->get_parameter_or("bumpstall", bumpstall, -1);
+//    // pulse
+//    node->get_parameter_or("pulse", pulse, -1.0);
+//    // rot_kp
+//    node->get_parameter_or("rot_kp", rot_kp, -1);
+//    // rot_kv
+//    node->get_parameter_or("rot_kv", rot_kv, -1);
+//    // rot_ki
+//    node->get_parameter_or("rot_ki", rot_ki, -1);
+//    // trans_kp
+//    node->get_parameter_or("trans_kp", trans_kp, -1);
+//    // trans_kv
+//    node->get_parameter_or("trans_kv", trans_kv, -1);
+//    // trans_ki
+//    node->get_parameter_or("trans_ki", trans_ki, -1);
+//    // !!! port !!!
+//    node->get_parameter_or("port", psos_serial_port, std::string(DEFAULT_P2OS_PORT));
+//    RCUTILS_LOG_INFO("using serial port: [%s]", psos_serial_port.c_str());
+//    node->get_parameter_or("use_tcp", psos_use_tcp, false);
+//    std::string host(DEFAULT_P2OS_TCP_REMOTE_HOST);
+//    node->get_parameter_or("tcp_remote_host", psos_tcp_host, host);
+//    node->get_parameter_or("tcp_remote_port", psos_tcp_port, DEFAULT_P2OS_TCP_REMOTE_PORT);
+//    // radio
+//    node->get_parameter_or("radio", radio_modemp, 0);
+//    // joystick
+//    node->get_parameter_or("joystick", joystick, 0);
+//    // direct_wheel_vel_control
+//    node->get_parameter_or("direct_wheel_vel_control", direct_wheel_vel_control, 0);
     // max xpeed
     double spd;
 //  n_private.param("max_xspeed", spd, MOTOR_DEF_MAX_SPEED);
     spd = MOTOR_DEF_MAX_SPEED;
-    node->get_parameter_or("max_xspeed", spd, MOTOR_DEF_MAX_SPEED);
+//    node->get_parameter_or("max_xspeed", spd, MOTOR_DEF_MAX_SPEED);
+    spd = params_.max_xspeed;
     motor_max_speed = (int) rint(1e3 * spd);
     // max_yawspeed
-    node->get_parameter_or("max_yawspeed", spd, MOTOR_DEF_MAX_TURNSPEED);
+//    node->get_parameter_or("max_yawspeed", spd, MOTOR_DEF_MAX_TURNSPEED);
+    spd = params_.max_yawspeed;
     motor_max_turnspeed = (short) rint(RTOD(spd));
     // max_xaccel
-    node->get_parameter_or("max_xaccel", spd, 0.0);
+//    node->get_parameter_or("max_xaccel", spd, 0.0);
+    spd = params_.max_xaccel;
     motor_max_trans_accel = (short) rint(1e3 * spd);
     // max_xdecel
-    node->get_parameter_or("max_xdecel", spd, 0.0);
+//    node->get_parameter_or("max_xdecel", spd, 0.0);
+    spd = params_.max_xdecel;
     motor_max_trans_decel = (short) rint(1e3 * spd);
     // max_yawaccel
-    node->get_parameter_or("max_yawaccel", spd, 0.0);
+//    node->get_parameter_or("max_yawaccel", spd, 0.0);
+    spd = params_.max_yawaccel;
     motor_max_rot_accel = (short) rint(RTOD(spd));
     // max_yawdecel
-    node->get_parameter_or("max_yawdecel", spd, 0.0);
+//    node->get_parameter_or("max_yawdecel", spd, 0.0);
+    spd = params_.max_yawdecel;
     motor_max_rot_decel = (short) rint(RTOD(spd));
 
     desired_freq = 10;
@@ -95,14 +104,14 @@ P2OSNode::P2OSNode(const std::shared_ptr<rclcpp::Node> &_node)
 //  qos.depth = 1000; /* TODO(allenh1): is this necessary? */
 //  qos.durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
     /* advertise topics */
-    pose_pub_ = node->create_publisher<nav_msgs::msg::Odometry>("pose", 10);
-    batt_pub_ = node->create_publisher<p2os_msgs::msg::BatteryState>("battery_state", 10);
-    mstate_pub_ = node->create_publisher<p2os_msgs::msg::MotorState>("motor_state", 10);
-    grip_state_pub_ = node->create_publisher<p2os_msgs::msg::GripperState>("gripper_state", 10);
-    ptz_state_pub_ = node->create_publisher<p2os_msgs::msg::PTZState>("ptz_state", 10);
-    sonar_pub_ = node->create_publisher<p2os_msgs::msg::SonarArray>("sonar", 10);
-    aio_pub_ = node->create_publisher<p2os_msgs::msg::AIO>("aio", 10);
-    dio_pub_ = node->create_publisher<p2os_msgs::msg::DIO>("dio", 10);
+    pose_pub_ = node->create_publisher<nav_msgs::msg::Odometry>(params_.pose_pub_topic, 10);
+    batt_pub_ = node->create_publisher<p2os_msgs::msg::BatteryState>(params_.battery_state_pub_topic, 10);
+    mstate_pub_ = node->create_publisher<p2os_msgs::msg::MotorState>(params_.motor_state_pub_topic, 10);
+    grip_state_pub_ = node->create_publisher<p2os_msgs::msg::GripperState>(params_.grip_state_pub, 10);
+    ptz_state_pub_ = node->create_publisher<p2os_msgs::msg::PTZState>(params_.ptz_state_pub_topic, 10);
+    sonar_pub_ = node->create_publisher<p2os_msgs::msg::SonarArray>(params_.sonar_pub_topic, 10);
+    aio_pub_ = node->create_publisher<p2os_msgs::msg::AIO>(params_.aio_pub_topic, 10);
+    dio_pub_ = node->create_publisher<p2os_msgs::msg::DIO>(params_.dio_pub_topic, 10);
 
     odom_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(node);
 
@@ -111,13 +120,13 @@ P2OSNode::P2OSNode(const std::shared_ptr<rclcpp::Node> &_node)
 
     /* subscribe to topics */
     cmdvel_sub_ = node->create_subscription<geometry_msgs::msg::Twist>(
-            "cmd_vel", 10, std::bind(&P2OSNode::cmdvel_cb, this, std::placeholders::_1));
+            params_.cmdvel_sub_topic, 10, std::bind(&P2OSNode::cmdvel_cb, this, std::placeholders::_1));
     cmdmstate_sub_ = node->create_subscription<p2os_msgs::msg::MotorState>(
-            "cmd_motor_state", 10, std::bind(&P2OSNode::cmdmotor_state, this, std::placeholders::_1));
+            params_.cmd_motor_state_sub_topic, 10, std::bind(&P2OSNode::cmdmotor_state, this, std::placeholders::_1));
     gripper_sub_ = node->create_subscription<p2os_msgs::msg::GripperState>(
-            "gripper_control", 10, std::bind(&P2OSNode::gripperCallback, this, std::placeholders::_1));
+            params_.gripper_control_sub_topic, 10, std::bind(&P2OSNode::gripperCallback, this, std::placeholders::_1));
     ptz_cmd_sub_ = node->create_subscription<p2os_msgs::msg::PTZState>(
-            "ptz_control", 10, std::bind(&P2OSPtz::callback, &ptz_, std::placeholders::_1));
+            params_.ptz_control_sub_topic, 10, std::bind(&P2OSPtz::callback, &ptz_, std::placeholders::_1));
     veltime = node->now();
 
     // add diagnostic functions
@@ -284,9 +293,9 @@ int P2OSNode::Setup() {
 
     // use serial port
 
-            ROS_INFO("P2OS connection opening serial port %s...", psos_serial_port.c_str());
+            ROS_INFO("P2OS connection opening serial port %s...", params_.usb_port.c_str());
 
-    if ((this->psos_fd = open(this->psos_serial_port.c_str(),
+    if ((this->psos_fd = open(params_.usb_port.c_str(),
                               O_RDWR | O_SYNC | O_NONBLOCK, S_IRUSR | S_IWUSR)) < 0) {
                 ROS_ERROR("P2OS::Setup():open():");
         return (1);
@@ -419,11 +428,11 @@ int P2OSNode::Setup() {
         usleep(P2OS_CYCLETIME_USEC);
     }
     if (psos_state != READY) {
-        if (this->psos_use_tcp)
+        if (params_.use_tcp)
                     ROS_INFO ("Couldn't synchronize with P2OS.\n"
                               "  Most likely because the robot is not connected %s %s",
-                              this->psos_use_tcp ? "to the ethernet-serial bridge device " : "to the serial port",
-                              this->psos_use_tcp ? this->psos_tcp_host.c_str() : this->psos_serial_port.c_str());
+                              params_.use_tcp ? "to the ethernet-serial bridge device " : "to the serial port",
+                              params_.use_tcp ? params_.tcp_remote_host : params_.usb_port.c_str());
         close(this->psos_fd);
         this->psos_fd = -1;
         return (1);
@@ -469,8 +478,8 @@ int P2OSNode::Setup() {
     // first, receive a packet so we know we're connected.
     if (!sippacket) {
         sippacket = new SIP(param_idx);
-        sippacket->odom_frame_id = odom_frame_id;
-        sippacket->base_link_frame_id = base_link_frame_id;
+        sippacket->odom_frame_id = params_.odom_frame_id;
+        sippacket->base_link_frame_id = params_.base_link_frame_id;
     }
     /*
       sippacket->x_offset = 0;
@@ -522,51 +531,51 @@ int P2OSNode::Setup() {
     // if requested, change PID settings
     P2OSPacket pid_packet;
     unsigned char pid_command[4];
-    if (this->rot_kp >= 0) {
+    if (params_.rot_kp >= 0) {
         pid_command[0] = ROTKP;
         pid_command[1] = ARGINT;
-        pid_command[2] = this->rot_kp & 0x00FF;
-        pid_command[3] = (this->rot_kp & 0xFF00) >> 8;
+        pid_command[2] = params_.rot_kp & 0x00FF;
+        pid_command[3] = (params_.rot_kp & 0xFF00) >> 8;
         pid_packet.Build(pid_command, 4);
         this->SendReceive(&pid_packet);
     }
-    if (this->rot_kv >= 0) {
+    if (params_.rot_kv >= 0) {
         pid_command[0] = ROTKV;
         pid_command[1] = ARGINT;
-        pid_command[2] = this->rot_kv & 0x00FF;
-        pid_command[3] = (this->rot_kv & 0xFF00) >> 8;
+        pid_command[2] = params_.rot_kv & 0x00FF;
+        pid_command[3] = (params_.rot_kv & 0xFF00) >> 8;
         pid_packet.Build(pid_command, 4);
         this->SendReceive(&pid_packet);
     }
-    if (this->rot_ki >= 0) {
+    if (params_.rot_ki >= 0) {
         pid_command[0] = ROTKI;
         pid_command[1] = ARGINT;
-        pid_command[2] = this->rot_ki & 0x00FF;
-        pid_command[3] = (this->rot_ki & 0xFF00) >> 8;
+        pid_command[2] = params_.rot_ki & 0x00FF;
+        pid_command[3] = (params_.rot_ki & 0xFF00) >> 8;
         pid_packet.Build(pid_command, 4);
         this->SendReceive(&pid_packet);
     }
-    if (this->trans_kp >= 0) {
+    if (params_.trans_kp >= 0) {
         pid_command[0] = TRANSKP;
         pid_command[1] = ARGINT;
-        pid_command[2] = this->trans_kp & 0x00FF;
-        pid_command[3] = (this->trans_kp & 0xFF00) >> 8;
+        pid_command[2] = params_.trans_kp & 0x00FF;
+        pid_command[3] = (params_.trans_kp & 0xFF00) >> 8;
         pid_packet.Build(pid_command, 4);
         this->SendReceive(&pid_packet);
     }
-    if (this->trans_kv >= 0) {
+    if (params_.trans_kv >= 0) {
         pid_command[0] = TRANSKV;
         pid_command[1] = ARGINT;
-        pid_command[2] = this->trans_kv & 0x00FF;
-        pid_command[3] = (this->trans_kv & 0xFF00) >> 8;
+        pid_command[2] = params_.trans_kv & 0x00FF;
+        pid_command[3] = (params_.trans_kv & 0xFF00) >> 8;
         pid_packet.Build(pid_command, 4);
         this->SendReceive(&pid_packet);
     }
-    if (this->trans_ki >= 0) {
+    if (params_.trans_ki >= 0) {
         pid_command[0] = TRANSKI;
         pid_command[1] = ARGINT;
-        pid_command[2] = this->trans_ki & 0x00FF;
-        pid_command[3] = (this->trans_ki & 0xFF00) >> 8;
+        pid_command[2] = params_.trans_ki & 0x00FF;
+        pid_command[3] = (params_.trans_ki & 0xFF00) >> 8;
         pid_packet.Build(pid_command, 4);
         this->SendReceive(&pid_packet);
     }
@@ -577,17 +586,17 @@ int P2OSNode::Setup() {
     // 1 = stall on front bumper contact
     // 2 = stall on rear bumper contact
     // 3 = stall on either bumper contact
-    if (this->bumpstall >= 0) {
-        if (this->bumpstall > 3)
+    if (params_.bumpstall >= 0) {
+        if (params_.bumpstall > 3)
                     ROS_INFO ("ignoring bumpstall value %d; should be 0, 1, 2, or 3",
-                              this->bumpstall);
+                              params_.bumpstall);
         else {
-                    ROS_INFO("setting bumpstall to %d", this->bumpstall);
+                    ROS_INFO("setting bumpstall to %d", params_.bumpstall);
             P2OSPacket bumpstall_packet;;
             unsigned char bumpstall_command[4];
             bumpstall_command[0] = BUMP_STALL;
             bumpstall_command[1] = ARGINT;
-            bumpstall_command[2] = (unsigned char) this->bumpstall;
+            bumpstall_command[2] = (unsigned char) params_.bumpstall;
             bumpstall_command[3] = 0;
             bumpstall_packet.Build(bumpstall_command, 4);
             this->SendReceive(&bumpstall_packet, false);
@@ -595,7 +604,7 @@ int P2OSNode::Setup() {
     }
 
     // Turn on the sonar
-    if (use_sonar_) {
+    if (params_.use_sonar) {
         this->ToggleSonarPower(1);
                 ROS_DEBUG("Sonar array powered on.");
     }

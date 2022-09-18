@@ -54,6 +54,9 @@
 #include <tf2_ros/buffer.h>
 #include <tf2/utils.h>
 
+
+#include <p2os_parameters.hpp>
+
 /* hacky, temporary macros */
 #define ROS_ERROR RCUTILS_LOG_ERROR
 #define ROS_INFO RCUTILS_LOG_INFO
@@ -154,7 +157,7 @@ public:
 
     void gripperCallback(const std::shared_ptr<p2os_msgs::msg::GripperState>);
 
-    const double &get_pulse() { return pulse; }
+    const double &get_pulse() { return params_.pulse; }
 
     // diagnostic messages
     /* TODO(allenh1): re-enable diagnostic_updater */
@@ -173,6 +176,9 @@ public:
 protected:
     //! Node Handler used for publication of data.
     std::shared_ptr<rclcpp::Node> node;
+
+    std::shared_ptr<p2os_parameters::ParamListener> param_listener_;
+    p2os_parameters::Params params_;
 
     /* TODO(allenh1): replace this with ROS2's version of dynamic_reconfigure */
     /* diagnostic_updater::Updater diagnostic_; */
@@ -199,26 +205,26 @@ protected:
     rclcpp::Time veltime;
 
     SIP *sippacket;
-    std::string psos_serial_port;
-    std::string psos_tcp_host;
-    std::string odom_frame_id;
-    std::string base_link_frame_id;
+//    std::string psos_serial_port;
+//    std::string psos_tcp_host;
+//    std::string odom_frame_id;
+//    std::string base_link_frame_id;
     int psos_fd;
-    bool psos_use_tcp;
-    int psos_tcp_port;
+//    bool psos_use_tcp;
+//    int psos_tcp_port;
     bool vel_dirty, motor_dirty;
     bool gripper_dirty_ = false;
     int param_idx;
     // PID settings
-    int rot_kp, rot_kv, rot_ki, trans_kp, trans_kv, trans_ki;
+//    int rot_kp, rot_kv, rot_ki, trans_kp, trans_kv, trans_ki;
 
     //! Stall I hit a wall?
-    int bumpstall; // should we change the bumper-stall behavior?
+//    int bumpstall; // should we change the bumper-stall behavior?
     //! Use Joystick?
-    int joystick;
+//    int joystick;
     //! Control wheel velocities individually?
-    int direct_wheel_vel_control;
-    int radio_modemp;
+//    int direct_wheel_vel_control;
+//    int radio_modemp;
 
     //! Maximum motor speed in Meters per second.
     int motor_max_speed;
@@ -233,12 +239,12 @@ protected:
     //! Minimum rotational acceleration in Meters per second per second.
     short motor_max_rot_decel;
     //! Pulse time
-    double pulse;
+//    double pulse;
     double desired_freq;
     //! Last time the node received or sent a pulse.
     double lastPulseTime;
     //! Use the sonar array?
-    bool use_sonar_;
+//    bool use_sonar_;
 
     P2OSPtz ptz_;
 };

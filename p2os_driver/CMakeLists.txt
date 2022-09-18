@@ -18,11 +18,15 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   "tf2_ros"
   "tf2_msgs"
   "tf2_geometry_msgs"
+  "generate_parameter_library"
 )
 foreach (Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach ()
 
+generate_parameter_library(p2os_parameters
+        src/p2os_parameters.yaml
+        )
 
 INCLUDE_DIRECTORIES(include)
 
@@ -36,6 +40,10 @@ add_executable(p2os_driver
   src/sip.cc
   src/p2os_ptz.cpp
 )
+target_link_libraries(p2os_driver
+        p2os_parameters
+)
+
 ament_target_dependencies(p2os_driver ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 ## Mark executables and/or libraries for installation

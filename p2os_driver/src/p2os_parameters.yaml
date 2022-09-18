@@ -1,0 +1,185 @@
+p2os_parameters:
+  pose_pub_topic: {
+    type: string,
+    default_value: "pose",
+    description: "topic to publish odometry messages",
+  }
+  battery_state_pub_topic: {
+    type: string,
+    default_value: "battery_state",
+    description: "topic to publish battery state messages",
+  }
+  motor_state_pub_topic: {
+    type: string,
+    default_value: "motor_state",
+    description: "topic to publish motor state messages",
+  }
+  grip_state_pub: {
+    type: string,
+    default_value: "gripper_state",
+    description: "topic to publish gripper state messages",
+  }
+  ptz_state_pub_topic: {
+    type: string,
+    default_value: "ptz_state",
+    description: "topic to publish ptz_state messages",
+  }
+  sonar_pub_topic: {
+    type: string,
+    default_value: "sonar",
+    description: "topic to publish sonar messages",
+  }
+  aio_pub_topic: {
+    type: string,
+    default_value: "aio",
+    description: "topic to publish aio messages",
+  }
+  dio_pub_topic: {
+    type: string,
+    default_value: "dio",
+    description: "topic to publish dio messages",
+  }
+  cmdvel_sub_topic: {
+    type: string,
+    default_value: "cmd_vel",
+    description: "topic to receive cmd_vel messages",
+  }
+  cmd_motor_state_sub_topic: {
+    type: string,
+    default_value: "cmd_motor_state",
+    description: "topic to receive cmd_motor_state messages",
+  }
+  gripper_control_sub_topic: {
+    type: string,
+    default_value: "gripper_control",
+    description: "topic to receive gripper_control messages",
+  }
+  ptz_control_sub_topic: {
+    type: string,
+    default_value: "ptz_control",
+    description: "topic to receive ptz_control messages",
+  }
+  odom_frame_id: {
+    type: string,
+    default_value: "odom",
+    description: "TF odom frame id",
+  }
+  base_link_frame_id: {
+    type: string,
+    default_value: "base_link",
+    description: "TF base_link frame id.",
+  }
+  use_sonar: {
+    type: bool,
+    default_value: false,
+    description: "specifies whether or not to use sonar",
+  }
+  bumpstall: {
+    type: int,
+    default_value: -1,
+    description: "specifies whether or not to use bumpstall. Valid values are should be 0, 1, 2, or 3 and -1 is false",
+  }
+  pulse: {
+    type: double,
+    default_value: -1.0,
+    description: "",
+  }
+  rot_kp: {
+    type: int,
+    default_value: -1,
+    description: "",
+  }
+  rot_kv: {
+    type: int,
+    default_value: -1,
+    description: "",
+  }
+  rot_ki: {
+    type: int,
+    default_value: -1,
+    description: "",
+  }
+  trans_kp: {
+    type: int,
+    default_value: -1,
+    description: "",
+  }
+  trans_kv: {
+    type: int,
+    default_value: -1,
+    description: "",
+  }
+  trans_ki: {
+    type: int,
+    default_value: -1,
+    description: "",
+  }
+  usb_port: {
+    type: string,
+    default_value: "/dev/ttyUSB0",
+    description: "USB port used to communicate with the robot",
+  }
+  use_tcp: {
+    type: bool,
+    default_value: false,
+    description: "specifies whether or not to use tcp",
+  }
+  tcp_remote_host: {
+    type: string,
+    default_value: "localhost",
+    description: "remote host IP address",
+  }
+  tcp_remote_port: {
+    type: int,
+    default_value: 8101,
+    description: "remote host port number",
+  }
+  radio: {
+    type: int,
+    default_value: 0,
+    description: "",
+  }
+  joystick: {
+    type: int,
+    default_value: 0,
+    description: "requests joystick packet, 0 to stop, 1 for 1, 2 for continuous",
+  }
+  direct_wheel_vel_control: {
+    type: int,
+    default_value: 0,
+    description: "",
+  }
+  max_xspeed: {
+    type: double,
+    default_value: 0.5,
+    description: "",
+  }
+  max_yawspeed: {
+    type: double,
+    default_value: 1.74533,
+    description: "",
+  }
+  max_xaccel: {
+    type: double,
+    default_value: 0.0,
+    description: "",
+  }
+  max_xdecel: {
+    type: double,
+    default_value: 0.0,
+    description: "",
+  }
+  max_yawaccel: {
+    type: double,
+    default_value: 0.0,
+    description: "",
+  }
+  max_yawdecel: {
+    type: double,
+    default_value: 0.0,
+    description: "",
+  }
+
+
+
+

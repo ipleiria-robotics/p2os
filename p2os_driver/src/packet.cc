@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <p2os_driver/packet.h>
+#include <p2os_driver/packet.hpp>
 #include <unistd.h>
 #include <stdlib.h> /* for exit() */
 

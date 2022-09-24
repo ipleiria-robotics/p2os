@@ -25,7 +25,7 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include <p2os_driver/p2os.h>
+#include <p2os_driver/p2os.hpp>
 
 P2OSNode::P2OSNode(const std::shared_ptr<rclcpp::Node> &_node)
         : node(_node), ptz_(this) {

@@ -21,7 +21,7 @@
  */
 
 #include <p2os_driver/p2os_ptz.h>
-#include <p2os_driver/p2os.h>
+#include <p2os_driver/p2os.hpp>
 
 //
 // Constants

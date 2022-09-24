@@ -29,8 +29,8 @@
 #define _P2OS_PTZ_H
 
 #include <p2os_msgs/msg/ptz_state.hpp>
-#include <p2os_driver/robot_params.h>
-#include <p2os_driver/packet.h>
+#include <p2os_driver/robot_params.hpp>
+#include <p2os_driver/packet.hpp>
 
 class P2OSNode;
 

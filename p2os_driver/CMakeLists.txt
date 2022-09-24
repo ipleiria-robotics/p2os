@@ -8,17 +8,17 @@ endif ()
 find_package(ament_cmake REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-  "p2os_msgs"
-  "std_msgs"
-  "nav_msgs"
-  "rclcpp"
-  "rcutils"
-  "geometry_msgs"
-  "tf2"
-  "tf2_ros"
-  "tf2_msgs"
-  "tf2_geometry_msgs"
-  "generate_parameter_library"
+  p2os_msgs
+  std_msgs
+  nav_msgs
+  rclcpp
+  rcutils
+  geometry_msgs
+  tf2
+  tf2_ros
+  tf2_msgs
+  tf2_geometry_msgs
+  generate_parameter_library
 )
 foreach (Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -34,11 +34,11 @@ INCLUDE_DIRECTORIES(include)
 add_executable(p2os_driver
   src/p2osnode.cc
   src/p2os.cc
-  src/kinecalc.cc
+  src/kinecalc.cpp
   src/packet.cc
-  src/robot_params.cc
   src/sip.cc
   src/p2os_ptz.cpp
+  src/robot_params.cpp
 )
 target_link_libraries(p2os_driver
         p2os_parameters
@@ -59,3 +59,4 @@ install(DIRECTORY
 
 
 ament_package()
+

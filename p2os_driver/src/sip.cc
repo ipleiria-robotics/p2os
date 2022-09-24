@@ -29,7 +29,7 @@
 #include <stdlib.h> /* for abs() */
 #include <unistd.h>
 
-#include <p2os_driver/sip.h>
+#include <p2os_driver/sip.hpp>
 //#include <tf2/convert.h>
 #include <tf2/transform_datatypes.h>
 #include <sstream>

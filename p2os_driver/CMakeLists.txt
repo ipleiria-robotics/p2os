@@ -1,50 +1,61 @@
-cmake_minimum_required(VERSION 3.9.5)
+cmake_minimum_required(VERSION 3.5)
 project(p2os_driver)
 
-# Default to C++14
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-endif()
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra)
-endif()
+if (NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif ()
+# find dependencies
+find_package(ament_cmake REQUIRED)
 
-find_package(catkin REQUIRED COMPONENTS
-  p2os_msgs
-  diagnostic_updater
-  nav_msgs
-  roscpp
-  geometry_msgs
-  tf
-  std_msgs
-  kdl_parser
+set(THIS_PACKAGE_INCLUDE_DEPENDS
+  "p2os_msgs"
+  "std_msgs"
+  "nav_msgs"
+  "rclcpp"
+  "rcutils"
+  "geometry_msgs"
+  "tf2"
+  "tf2_ros"
+  "tf2_msgs"
+  "tf2_geometry_msgs"
+  "generate_parameter_library"
 )
+foreach (Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  find_package(${Dependency} REQUIRED)
+endforeach ()
 
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES p2os_driver
-  CATKIN_DEPENDS p2os_msgs nav_msgs roscpp geometry_msgs diagnostic_updater tf std_msgs kdl_parser
-)
+generate_parameter_library(p2os_parameters
+        src/p2os_parameters.yaml
+        )
 
-## Specify additional locations of header files
-include_directories(include
-  ${catkin_INCLUDE_DIRS}
-)
+INCLUDE_DIRECTORIES(include)
 
 ## Declare a cpp executable
 add_executable(p2os_driver
-  src/p2osnode.cpp
-  src/p2os.cpp
-  src/kinecalc.cpp
-  src/packet.cpp
-  src/robot_params.cpp
-  src/sip.cpp
+  src/p2osnode.cc
+  src/p2os.cc
+  src/kinecalc.cc
+  src/packet.cc
+  src/robot_params.cc
+  src/sip.cc
   src/p2os_ptz.cpp
 )
+target_link_libraries(p2os_driver
+        p2os_parameters
+)
 
-target_link_libraries(p2os_driver ${catkin_LIBRARIES})
+ament_target_dependencies(p2os_driver ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 ## Mark executables and/or libraries for installation
-install(TARGETS p2os_driver
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+install(
+  TARGETS p2os_driver
+  DESTINATION lib/${PROJECT_NAME}
 )
+
+install(DIRECTORY
+        launch
+        DESTINATION share/${PROJECT_NAME}
+)
+
+
+ament_package()

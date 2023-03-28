@@ -195,13 +195,15 @@ void P2OSNode::check_and_set_gripper_state() {
 void P2OSNode::cmdvel_cb(const std::shared_ptr<geometry_msgs::msg::Twist> msg) {
     if (fabs(msg->linear.x - cmdvel_.linear.x) > 0.01 || fabs(msg->angular.z - cmdvel_.angular.z) > 0.01) {
         veltime = node->now();
-                ROS_DEBUG("new speed: [%0.2f,%0.2f](%0.3f)", msg->linear.x * 1e3, msg->angular.z, veltime.seconds());
+        RCLCPP_DEBUG(node->get_logger(),
+                    "new speed: [%0.2f,%0.2f](%0.3f)", msg->linear.x * 1e3, msg->angular.z, veltime.seconds());
         vel_dirty = true;
         cmdvel_ = *msg;
     } else {
         rclcpp::Duration veldur = node->now() - veltime;
         if (veldur.seconds() > 2.0 && ((fabs(cmdvel_.linear.x) > 0.01) || (fabs(cmdvel_.angular.z) > 0.01))) {
-                    ROS_DEBUG("maintaining old speed: %0.3f|%0.3f", veltime.seconds(), node->now().seconds());
+            RCLCPP_DEBUG(node->get_logger(),
+                         "maintaining old speed: %0.3f|%0.3f", veltime.seconds(), node->now().seconds());
             vel_dirty = true;
             veltime = node->now();
         }
@@ -212,7 +214,8 @@ void P2OSNode::cmdvel_cb(const std::shared_ptr<geometry_msgs::msg::Twist> msg) {
 void P2OSNode::check_and_set_vel() {
     if (!vel_dirty) return;
 
-            ROS_DEBUG("setting vel: [%0.2f,%0.2f]", cmdvel_.linear.x, cmdvel_.angular.z);
+    RCLCPP_DEBUG(node->get_logger(),
+                 "setting vel: [%0.2f,%0.2f]", cmdvel_.linear.x, cmdvel_.angular.z);
     vel_dirty = false;
 
     unsigned short absSpeedDemand, absturnRateDemand;
@@ -293,16 +296,19 @@ int P2OSNode::Setup() {
 
     // use serial port
 
-            ROS_INFO("P2OS connection opening serial port %s...", params_.usb_port.c_str());
+    RCLCPP_INFO(node->get_logger(),
+                "P2OS connection opening serial port %s...", params_.usb_port.c_str());
 
     if ((this->psos_fd = open(params_.usb_port.c_str(),
                               O_RDWR | O_SYNC | O_NONBLOCK, S_IRUSR | S_IWUSR)) < 0) {
-                ROS_ERROR("P2OS::Setup():open():");
+        RCLCPP_ERROR(node->get_logger(),
+                     "P2OS::Setup():open():");
         return (1);
     }
 
     if (tcgetattr(this->psos_fd, &term) < 0) {
-                ROS_ERROR("P2OS::Setup():tcgetattr():");
+        RCLCPP_ERROR(node->get_logger(),
+                     "P2OS::Setup():tcgetattr():");
         close(this->psos_fd);
         this->psos_fd = -1;
         return (1);
@@ -313,21 +319,24 @@ int P2OSNode::Setup() {
     cfsetospeed(&term, bauds[currbaud]);
 
     if (tcsetattr(this->psos_fd, TCSAFLUSH, &term) < 0) {
-                ROS_ERROR("P2OS::Setup():tcsetattr():");
+        RCLCPP_ERROR(node->get_logger(),
+                     "P2OS::Setup():tcsetattr():");
         close(this->psos_fd);
         this->psos_fd = -1;
         return (1);
     }
 
     if (tcflush(this->psos_fd, TCIOFLUSH) < 0) {
-                ROS_ERROR("P2OS::Setup():tcflush():");
+        RCLCPP_ERROR(node->get_logger(),
+                     "P2OS::Setup():tcflush():");
         close(this->psos_fd);
         this->psos_fd = -1;
         return (1);
     }
 
     if ((flags = fcntl(this->psos_fd, F_GETFL)) < 0) {
-                ROS_ERROR("P2OS::Setup():fcntl()");
+        RCLCPP_ERROR(node->get_logger(),
+                     "P2OS::Setup():fcntl()");
         close(this->psos_fd);
         this->psos_fd = -1;
         return (1);
@@ -344,9 +353,11 @@ int P2OSNode::Setup() {
                 usleep(P2OS_CYCLETIME_USEC);
                 break;
             case AFTER_FIRST_SYNC:
-                        ROS_INFO("turning off NONBLOCK mode...");
+                RCLCPP_INFO(node->get_logger(),
+                            "turning off NONBLOCK mode...");
                 if (fcntl(this->psos_fd, F_SETFL, flags ^ O_NONBLOCK) < 0) {
-                            ROS_ERROR("P2OS::Setup():fcntl()");
+                    RCLCPP_ERROR(node->get_logger(),
+                                 "P2OS::Setup():fcntl()");
                     close(this->psos_fd);
                     this->psos_fd = -1;
                     return (1);
@@ -377,14 +388,16 @@ int P2OSNode::Setup() {
                     cfsetispeed(&term, bauds[currbaud]);
                     cfsetospeed(&term, bauds[currbaud]);
                     if (tcsetattr(this->psos_fd, TCSAFLUSH, &term) < 0) {
-                                ROS_ERROR("P2OS::Setup():tcsetattr():");
+                        RCLCPP_ERROR(node->get_logger(),
+                                     "P2OS::Setup():tcsetattr():");
                         close(this->psos_fd);
                         this->psos_fd = -1;
                         return (1);
                     }
 
                     if (tcflush(this->psos_fd, TCIOFLUSH) < 0) {
-                                ROS_ERROR("P2OS::Setup():tcflush():");
+                        RCLCPP_ERROR(node->get_logger(),
+                                     "P2OS::Setup():tcflush():");
                         close(this->psos_fd);
                         this->psos_fd = -1;
                         return (1);
@@ -399,22 +412,26 @@ int P2OSNode::Setup() {
         }
         switch (receivedpacket.packet[3]) {
             case SYNC0:
-                        ROS_INFO("SYNC0");
+                RCLCPP_INFO(node->get_logger(),
+                             "SYNC0");
                 psos_state = AFTER_FIRST_SYNC;
                 break;
             case SYNC1:
-                        ROS_INFO("SYNC1");
+                RCLCPP_INFO(node->get_logger(),
+                            "SYNC1");
                 psos_state = AFTER_SECOND_SYNC;
                 break;
             case SYNC2:
-                        ROS_INFO("SYNC2");
+                RCLCPP_INFO(node->get_logger(),
+                            "SYNC2");
                 psos_state = READY;
                 break;
             default:
                 // maybe P2OS is still running from last time.  let's try to CLOSE
                 // and reconnect
                 if (!sent_close) {
-                            ROS_DEBUG("sending CLOSE");
+                    RCLCPP_DEBUG(node->get_logger(),
+                                 "sending CLOSE");
                     command = CLOSE;
                     packet.Build(&command, 1);
                     packet.Send(this->psos_fd);
@@ -429,10 +446,11 @@ int P2OSNode::Setup() {
     }
     if (psos_state != READY) {
         if (params_.use_tcp)
-                    ROS_INFO ("Couldn't synchronize with P2OS.\n"
-                              "  Most likely because the robot is not connected %s %s",
-                              params_.use_tcp ? "to the ethernet-serial bridge device " : "to the serial port",
-                              params_.use_tcp ? params_.tcp_remote_host : params_.usb_port.c_str());
+            RCLCPP_INFO(node->get_logger(),
+                        "Couldn't synchronize with P2OS."
+                        "  Most likely because the robot is not connected %s %s\n",
+                        params_.use_tcp ? "to the ethernet-serial bridge device " : "to the serial port",
+                        params_.use_tcp ? params_.tcp_remote_host.c_str() : params_.usb_port.c_str());
         close(this->psos_fd);
         this->psos_fd = -1;
         return (1);
@@ -457,7 +475,8 @@ int P2OSNode::Setup() {
     packet.Send(this->psos_fd);
     usleep(P2OS_CYCLETIME_USEC);
 
-            ROS_INFO("Done.\n   Connected to %s, a %s %s", name, type, subtype);
+    RCLCPP_INFO(node->get_logger(),
+                "Done.\n   Connected to %s, a %s %s", name, type, subtype);
 
     // now, based on robot type, find the right set of parameters
     for (i = 0; i < PLAYER_NUM_ROBOT_TYPES; i++) {
@@ -477,7 +496,7 @@ int P2OSNode::Setup() {
 
     // first, receive a packet so we know we're connected.
     if (!sippacket) {
-        sippacket = new SIP(param_idx);
+        sippacket = new SIP(param_idx, this);
         sippacket->odom_frame_id = params_.odom_frame_id;
         sippacket->base_link_frame_id = params_.base_link_frame_id;
     }
@@ -588,10 +607,12 @@ int P2OSNode::Setup() {
     // 3 = stall on either bumper contact
     if (params_.bumpstall >= 0) {
         if (params_.bumpstall > 3)
-                    ROS_INFO ("ignoring bumpstall value %d; should be 0, 1, 2, or 3",
-                              params_.bumpstall);
+            RCLCPP_INFO(node->get_logger(),
+                        "ignoring bumpstall value %ld; should be 0, 1, 2, or 3",
+                        params_.bumpstall);
         else {
-                    ROS_INFO("setting bumpstall to %d", params_.bumpstall);
+            RCLCPP_INFO(node->get_logger(),
+                        "setting bumpstall to %ld", params_.bumpstall);
             P2OSPacket bumpstall_packet;;
             unsigned char bumpstall_command[4];
             bumpstall_command[0] = BUMP_STALL;
@@ -606,7 +627,8 @@ int P2OSNode::Setup() {
     // Turn on the sonar
     if (params_.use_sonar) {
         this->ToggleSonarPower(1);
-                ROS_DEBUG("Sonar array powered on.");
+        RCLCPP_DEBUG(node->get_logger(),
+                     "Sonar array powered on.");
     }
     ptz_.setup();
 
@@ -638,7 +660,8 @@ int P2OSNode::Shutdown() {
 
     close(this->psos_fd);
     this->psos_fd = -1;
-            ROS_INFO("P2OS has been shutdown");
+    RCLCPP_INFO(node->get_logger(),
+                "P2OS has been shutdown");
     delete this->sippacket;
     this->sippacket = NULL;
 
@@ -686,7 +709,8 @@ int P2OSNode::SendReceive(P2OSPacket *pkt, bool publish_data) {
         /* receive a packet */
         pthread_testcancel();
         if (packet.Receive(this->psos_fd, node)) {
-                    ROS_ERROR("RunPsosThread(): Receive errored");
+            RCLCPP_ERROR(node->get_logger(),
+                 "RunPsosThread(): Receive errored");
             pthread_exit(NULL);
         }
 
@@ -707,7 +731,8 @@ int P2OSNode::SendReceive(P2OSPacket *pkt, bool publish_data) {
             if (ptz_.isOn()) {
                 int len = packet.packet[2] - 3;
                 if (ptz_.cb_.gotPacket()) {
-                            ROS_ERROR("PTZ got a message, but alread has the complete packet.");
+                    RCLCPP_ERROR(node->get_logger(),
+                                 "PTZ got a message, but alread has the complete packet.");
                 } else {
                     for (int i = 4; i < 4 + len; ++i) {
                         ptz_.cb_.putOnBuf(packet.packet[i]);
@@ -715,7 +740,8 @@ int P2OSNode::SendReceive(P2OSPacket *pkt, bool publish_data) {
                 }
             }
         } else {
-                    ROS_ERROR("Received other packet!");
+            RCLCPP_ERROR(node->get_logger(),
+                         "Received other packet!");
             packet.PrintHex();
         }
     }
@@ -759,7 +785,8 @@ void P2OSNode::ResetRawPositions() {
         p2oscommand[1] = ARGINT;
         pkt.Build(p2oscommand, 2);
         this->SendReceive(&pkt, false);
-                ROS_INFO("resetting raw positions");
+        RCLCPP_INFO(node->get_logger(),
+                    "resetting raw positions");
     }
 }
 
@@ -784,7 +811,8 @@ void P2OSNode::ToggleSonarPower(unsigned char val) {
 void P2OSNode::ToggleMotorPower(unsigned char val) {
     unsigned char command[4];
     P2OSPacket packet;
-            ROS_INFO("motor state: %d\n", p2os_data.motors.state);
+    RCLCPP_INFO(node->get_logger(),
+                "motor state: %d\n", p2os_data.motors.state);
     p2os_data.motors.state = (int) val;
     command[0] = ENABLE;
     command[1] = ARGINT;

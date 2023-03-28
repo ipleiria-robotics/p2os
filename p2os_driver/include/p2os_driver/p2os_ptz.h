@@ -164,9 +164,8 @@ class P2OSPtz
   // Simple getters and setters
   bool isOn() const { return is_on_; }
   p2os_msgs::msg::PTZState getCurrentState() { return current_state_; }
-
+protected:
   // Class members
- protected:
   P2OSNode* p2os_;
  public:
   circbuf cb_;

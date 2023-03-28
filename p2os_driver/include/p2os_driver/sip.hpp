@@ -27,6 +27,8 @@
 #include <cstdint>
 #include <string>
 
+class P2OSNode;
+
 typedef struct ArmJoint
 {
   char speed;
@@ -57,7 +59,8 @@ class SIP
 private:
   int PositionChange(uint16_t, uint16_t);
   int param_idx;   // index of our robot's data in the parameter table
-
+protected:
+  P2OSNode* p2os_;
 public:
   // these values are returned in every standard SIP
   bool lwstall, rwstall;
@@ -114,14 +117,14 @@ public:
   // void FillGyro(player_p2os_data_t* data);
   // void FillArm(player_p2os_data_t* data);
 
-  explicit SIP(int idx)
+  explicit SIP(int idx, P2OSNode * p2os)
   : param_idx(idx), sonarreadings(0), sonars(NULL),
     xpos(0), ypos(0), x_offset(0), y_offset(0), angle_offset(0),
     blobmx(0), blobmy(0), blobx1(0), blobx2(0), bloby1(0), bloby2(0),
     blobarea(0), blobconf(0), blobcolor(0),
     armPowerOn(false), armConnected(false), armVersionString(NULL),
     armNumJoints(0), armJoints(NULL),
-    lastLiftPos(0.0f)
+    lastLiftPos(0.0f), p2os_(p2os)
   {
     for (int i = 0; i < 6; ++i) {
       armJointMoving[i] = false;

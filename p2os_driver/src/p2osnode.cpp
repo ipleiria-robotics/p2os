@@ -36,7 +36,8 @@ int main(int argc, char ** argv)
   P2OSNode * p = new P2OSNode(n);
 
   if (p->Setup()) {
-    ROS_ERROR("p2os setup failed...");
+    RCLCPP_ERROR(this->p2os_->node->logger(),
+                 "p2os setup failed...");
     return -1;
   }
 
@@ -53,7 +54,8 @@ int main(int argc, char ** argv)
       ros::Time currentTime = ros::Time::now();
       ros::Duration pulseInterval = currentTime - lastTime;
       if (pulseInterval.toSec() > p->get_pulse()) {
-        ROS_DEBUG("sending pulse");
+        RCLCPP_DEBUG(this->p2os_->node->logger(),
+                     "sending pulse");
         p->SendPulse();
         lastTime = currentTime;
       }

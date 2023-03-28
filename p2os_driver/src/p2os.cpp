@@ -484,7 +484,7 @@ int P2OSNode::Setup()
 
   // first, receive a packet so we know we're connected.
   if (!sippacket) {
-    sippacket = new SIP(param_idx);
+    sippacket = new SIP(param_idx, this);
     sippacket->odom_frame_id = odom_frame_id;
     sippacket->base_link_frame_id = base_link_frame_id;
   }

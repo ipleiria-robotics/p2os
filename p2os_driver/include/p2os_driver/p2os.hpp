@@ -57,10 +57,6 @@
 
 #include <p2os_parameters.hpp>
 
-/* hacky, temporary macros */
-#define ROS_ERROR RCUTILS_LOG_ERROR
-#define ROS_INFO RCUTILS_LOG_INFO
-#define ROS_DEBUG RCUTILS_LOG_DEBUG
 
 /* #include <diagnostic_updater/publisher.h> */
 /* #include <diagnostic_updater/diagnostic_updater.h> */
@@ -173,10 +169,10 @@ public:
     //! sensor data container
     ros_p2os_data_t p2os_data;
 
-protected:
     //! Node Handler used for publication of data.
     std::shared_ptr<rclcpp::Node> node;
 
+protected:
     std::shared_ptr<p2os_parameters::ParamListener> param_listener_;
     p2os_parameters::Params params_;
 

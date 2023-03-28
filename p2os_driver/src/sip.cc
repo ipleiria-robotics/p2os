@@ -264,44 +264,54 @@ int SIP::PositionChange(unsigned short from, unsigned short to) {
 void SIP::Print() {
     int i;
 
-            ROS_DEBUG("lwstall:%d rwstall:%d\n", lwstall, rwstall);
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                    "lwstall:%d rwstall:%d\n", lwstall, rwstall);
 
     std::stringstream front_bumper_info;
     for (int i = 0; i < 5; i++) {
         front_bumper_info << " "
                           << static_cast<int>((frontbumpers >> i) & 0x01 );
     }
-            ROS_DEBUG("Front bumpers:%s", front_bumper_info.str().c_str());
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Front bumpers:%s", front_bumper_info.str().c_str());
     std::stringstream rear_bumper_info;
     for (int i = 0; i < 5; i++) {
         rear_bumper_info << " "
                          << static_cast<int>((rearbumpers >> i) & 0x01 );
     }
-            ROS_DEBUG("Rear bumpers:%s", rear_bumper_info.str().c_str());
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Rear bumpers:%s", rear_bumper_info.str().c_str());
 
-            ROS_DEBUG("status: 0x%x analog: %d param_id: %d ", status, analog, param_idx);
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "status: 0x%x analog: %d param_id: %d ", status, analog, param_idx);
     std::stringstream status_info;
     for (i = 0; i < 11; i++) {
         status_info << " "
                     << static_cast<int>((status >> (7 - i)) & 0x01);
     }
-            ROS_DEBUG("status:%s", status_info.str().c_str());
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "status:%s", status_info.str().c_str());
     std::stringstream digin_info;
     for (i = 0; i < 8; i++) {
         digin_info << " "
                    << static_cast<int>((digin >> (7 - i)) & 0x01);
     }
-            ROS_DEBUG("digin:%s", digin_info.str().c_str());
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "digin:%s", digin_info.str().c_str());
     std::stringstream digout_info;
     for (i = 0; i < 8; i++) {
         digout_info << " "
                     << static_cast<int>((digout >> (7 - i)) & 0x01);
     }
-            ROS_DEBUG("digout:%s", digout_info.str().c_str());
-            ROS_DEBUG("battery: %d compass: %d sonarreadings: %d\n", battery,
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "digout:%s", digout_info.str().c_str());
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "battery: %d compass: %d sonarreadings: %d\n", battery,
                       compass, sonarreadings);
-            ROS_DEBUG("xpos: %d ypos:%d ptu:%hu timer:%hu\n", xpos, ypos, ptu, timer);
-            ROS_DEBUG("angle: %d lvel: %d rvel: %d control: %d\n", angle, lvel,
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                         "xpos: %d ypos:%d ptu:%hu timer:%hu\n", xpos, ypos, ptu, timer);
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "angle: %d lvel: %d rvel: %d control: %d\n", angle, lvel,
                       rvel, control);
 
     PrintSonars();
@@ -316,25 +326,33 @@ void SIP::PrintSonars() {
     for (int i = 0; i < sonarreadings; i++) {
         sonar_info << " " << static_cast<int>(sonars[i]);
     }
-            ROS_DEBUG("Sonars: %s", sonar_info.str().c_str());
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Sonars: %s", sonar_info.str().c_str());
 }
 
 void SIP::PrintArm() {
-            ROS_DEBUG ("Arm power is %s\tArm is %sconnected\n", (armPowerOn ? "on" : "off"),
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Arm power is %s\tArm is %sconnected\n", (armPowerOn ? "on" : "off"),
                        (armConnected ? "" : "not "));
-            ROS_DEBUG ("Arm joint status:\n");
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Arm joint status:\n");
     for (int ii = 0; ii < 6; ii++)
-                ROS_DEBUG ("Joint %d   %s   %d\n", ii + 1, (armJointMoving[ii] ? "Moving " : "Stopped"),
-                           armJointPos[ii]);
+        RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                     "Joint %d   %s   %d\n", ii + 1, (armJointMoving[ii] ? "Moving " : "Stopped"),
+                     armJointPos[ii]);
 }
 
 void SIP::PrintArmInfo() {
-            ROS_DEBUG ("Arm version:\t%s\n", armVersionString);
-            ROS_DEBUG ("Arm has %d joints:\n", armNumJoints);
-            ROS_DEBUG ("  |\tSpeed\tHome\tMin\tCentre\tMax\tTicks/90\n");
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Arm version:\t%s\n", armVersionString);
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "Arm has %d joints:\n", armNumJoints);
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "  |\tSpeed\tHome\tMin\tCentre\tMax\tTicks/90\n");
     for (int ii = 0; ii < armNumJoints; ii++)
-                ROS_DEBUG ("%d |\t%d\t%d\t%d\t%d\t%d\t%d\n", ii, armJoints[ii].speed, armJoints[ii].home,
-                           armJoints[ii].min, armJoints[ii].centre, armJoints[ii].max, armJoints[ii].ticksPer90);
+        RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                     "%d |\t%d\t%d\t%d\t%d\t%d\t%d\n", ii, armJoints[ii].speed, armJoints[ii].home,
+                     armJoints[ii].min, armJoints[ii].centre, armJoints[ii].max, armJoints[ii].ticksPer90);
 }
 
 void SIP::ParseStandard(unsigned char *buffer) {
@@ -361,7 +379,8 @@ void SIP::ParseStandard(unsigned char *buffer) {
         change = (int) rint(PositionChange(rawxpos, newxpos) *
                             PlayerRobotParams[param_idx].DistConvFactor);
         if (abs(change) > 100)
-                    ROS_DEBUG ("invalid odometry change [%d]; odometry values are tainted", change);
+            RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                         "invalid odometry change [%d]; odometry values are tainted", change);
         else
             xpos += change;
     } else
@@ -376,7 +395,8 @@ void SIP::ParseStandard(unsigned char *buffer) {
         change = (int) rint(PositionChange(rawypos, newypos) *
                             PlayerRobotParams[param_idx].DistConvFactor);
         if (abs(change) > 100)
-                    ROS_DEBUG ("invalid odometry change [%d]; odometry values are tainted", change);
+            RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                         "invalid odometry change [%d]; odometry values are tainted", change);
         else
             ypos += change;
     } else
@@ -401,7 +421,8 @@ void SIP::ParseStandard(unsigned char *buffer) {
 
     battery = buffer[cnt];
     cnt += sizeof(unsigned char);
-            ROS_DEBUG("battery value: %d", battery);
+    RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                 "battery value: %d", battery);
 
     lwstall = buffer[cnt] & 0x01;
     rearbumpers = buffer[cnt] >> 1;
@@ -485,7 +506,8 @@ void SIP::ParseSERAUX(unsigned char *buffer) {
     unsigned char type = buffer[1];
     if (type != SERAUX && type != SERAUX2) {
         // Really should never get here...
-                ROS_ERROR("Attempt to parse non SERAUX packet as serial data.\n");
+        RCLCPP_ERROR(this->p2os_->node->get_logger(),
+                     "Attempt to parse non SERAUX packet as serial data.\n");
         return;
     }
 
@@ -503,17 +525,19 @@ void SIP::ParseSERAUX(unsigned char *buffer) {
         if (buffer[ix] == 255)
             break;        // Got it!
     if (len < 10 || ix > len - 8) {
-                ROS_ERROR("Failed to get a full blob tracking packet.\n");
+        RCLCPP_ERROR(this->p2os_->node->get_logger(),
+                     "Failed to get a full blob tracking packet.\n");
         return;
     }
 
     // There is a special 'S' message containing the tracking color info
     if (buffer[ix + 1] == 'S') {
         // Color information (track color)
-                ROS_DEBUG("Tracking color (RGB):  %d %d %d\n"
-                          "       with variance:  %d %d %d\n",
-                          buffer[ix + 2], buffer[ix + 3], buffer[ix + 4],
-                          buffer[ix + 5], buffer[ix + 6], buffer[ix + 7]);
+            RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                         "Tracking color (RGB):  %d %d %d\n"
+                         "       with variance:  %d %d %d\n",
+                         buffer[ix + 2], buffer[ix + 3], buffer[ix + 4],
+                         buffer[ix + 5], buffer[ix + 6], buffer[ix + 7]);
         blobcolor = buffer[ix + 2] << 16 | buffer[ix + 3] << 8 | buffer[ix + 4];
         return;
     }
@@ -533,7 +557,8 @@ void SIP::ParseSERAUX(unsigned char *buffer) {
         return;
     }
 
-            ROS_ERROR("Unknown blob tracker packet type: %c\n", buffer[ix + 1]);
+    RCLCPP_ERROR(this->p2os_->node->get_logger(),
+                 "Unknown blob tracker packet type: %c\n", buffer[ix + 1]);
     return;
 }
 
@@ -552,12 +577,14 @@ SIP::ParseGyro(unsigned char *buffer) {
     unsigned char type = buffer[1];
     if (type != GYROPAC) {
         // Really should never get here...
-                ROS_ERROR("Attempt to parse non GYRO packet as gyro data.\n");
+        RCLCPP_ERROR(this->p2os_->node->get_logger(),
+                     "Attempt to parse non GYRO packet as gyro data.\n");
         return;
     }
 
     if (len < 1) {
-                ROS_DEBUG("Couldn't get gyro measurement count");
+        RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                     "Couldn't get gyro measurement count");
         return;
     }
 
@@ -566,7 +593,8 @@ SIP::ParseGyro(unsigned char *buffer) {
 
     // sanity check
     if ((len - 1) != (count * 3)) {
-                ROS_DEBUG("Mismatch between gyro measurement count and packet length");
+        RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                     "Mismatch between gyro measurement count and packet length");
         return;
     }
 
@@ -598,12 +626,14 @@ void SIP::ParseArm(unsigned char *buffer) {
     int length = (int) buffer[0] - 2;
 
     if (buffer[1] != ARMPAC) {
-                ROS_ERROR("Attempt to parse a non ARM packet as arm data.\n");
+        RCLCPP_ERROR(this->p2os_->node->get_logger(),
+                     "Attempt to parse a non ARM packet as arm data.\n");
         return;
     }
 
     if (length < 1 || length != 9) {
-                ROS_DEBUG ("ARMpac length incorrect size");
+        RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                     "ARMpac length incorrect size");
         return;
     }
 
@@ -639,12 +669,14 @@ void SIP::ParseArm(unsigned char *buffer) {
 void SIP::ParseArmInfo(unsigned char *buffer) {
     int length = (int) buffer[0] - 2;
     if (buffer[1] != ARMINFOPAC) {
-                ROS_ERROR ("Attempt to parse a non ARMINFO packet as arm info.\n");
+        RCLCPP_ERROR(this->p2os_->node->get_logger(),
+                     "Attempt to parse a non ARMINFO packet as arm info.\n");
         return;
     }
 
     if (length < 1) {
-                ROS_DEBUG ("ARMINFOpac length bad size");
+        RCLCPP_DEBUG(this->p2os_->node->get_logger(),
+                     "ARMINFOpac length bad size");
         return;
     }
 

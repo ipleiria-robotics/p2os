@@ -40,7 +40,8 @@ int main(int argc, char** argv)
     
     if(p->Setup())
     {
-        ROS_ERROR("p2os setup failed...");
+        RCLCPP_ERROR(n->get_logger(),
+                     "p2os setup failed...");
         return -1;
     }
     
@@ -60,7 +61,8 @@ int main(int argc, char** argv)
             rclcpp::Duration pulseInterval = currentTime - lastTime;
             if(pulseInterval.seconds() > p->get_pulse())
             { 
-                ROS_DEBUG ("sending pulse" );
+                RCLCPP_DEBUG(n->get_logger(),
+                             "sending pulse" );
                 p->SendPulse();
                 lastTime = currentTime;
             }
@@ -78,10 +80,10 @@ int main(int argc, char** argv)
     
     if(!p->Shutdown())
     {
-        RCLCPP_WARN(n->get_logger(),"p2os shutdown failed... your robot might be heading for the wall?");
+        RCLCPP_WARN(n->get_logger(), "p2os shutdown failed... your robot might be heading for the wall?");
     }
     delete p; //delete pointer
     
-    ROS_INFO( "Quitting... " );
+    RCLCPP_INFO(n->get_logger(), "Quitting... " );
     return 0;
 }
